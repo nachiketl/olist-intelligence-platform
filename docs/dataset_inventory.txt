@@ -1,0 +1,52 @@
+﻿======================================================================
+olist_customers_dataset.csv | rows, cols: (99441, 5)
+Columns: ['customer_id', 'customer_unique_id', 'customer_zip_code_prefix', 'customer_city', 'customer_state']
+Nulls: none
+Fully duplicated rows: 0
+======================================================================
+olist_geolocation_dataset.csv | rows, cols: (1000163, 5)
+Columns: ['geolocation_zip_code_prefix', 'geolocation_lat', 'geolocation_lng', 'geolocation_city', 'geolocation_state']
+Nulls: none
+Fully duplicated rows: 261831
+======================================================================
+olist_order_items_dataset.csv | rows, cols: (112650, 7)
+Columns: ['order_id', 'order_item_id', 'product_id', 'seller_id', 'shipping_limit_date', 'price', 'freight_value']
+Nulls: none
+Fully duplicated rows: 0
+  shipping_limit_date: 2016-09-19 00:15:34 -> 2020-04-09 22:35:08
+======================================================================
+olist_order_payments_dataset.csv | rows, cols: (103886, 5)
+Columns: ['order_id', 'payment_sequential', 'payment_type', 'payment_installments', 'payment_value']
+Nulls: none
+Fully duplicated rows: 0
+======================================================================
+olist_order_reviews_dataset.csv | rows, cols: (99224, 7)
+Columns: ['review_id', 'order_id', 'review_score', 'review_comment_title', 'review_comment_message', 'review_creation_date', 'review_answer_timestamp']
+Nulls: {'review_comment_title': 87656, 'review_comment_message': 58247}
+Fully duplicated rows: 0
+  review_creation_date: 2016-10-02 00:00:00 -> 2018-08-31 00:00:00
+  review_answer_timestamp: 2016-10-07 18:32:28 -> 2018-10-29 12:27:35
+======================================================================
+olist_orders_dataset.csv | rows, cols: (99441, 8)
+Columns: ['order_id', 'customer_id', 'order_status', 'order_purchase_timestamp', 'order_approved_at', 'order_delivered_carrier_date', 'order_delivered_customer_date', 'order_estimated_delivery_date']
+Nulls: {'order_approved_at': 160, 'order_delivered_carrier_date': 1783, 'order_delivered_customer_date': 2965}
+Fully duplicated rows: 0
+  order_purchase_timestamp: 2016-09-04 21:15:19 -> 2018-10-17 17:30:18
+  order_delivered_carrier_date: 2016-10-08 10:34:01 -> 2018-09-11 19:48:28
+  order_delivered_customer_date: 2016-10-11 13:46:32 -> 2018-10-17 13:22:46
+  order_estimated_delivery_date: 2016-09-30 00:00:00 -> 2018-11-12 00:00:00
+======================================================================
+olist_products_dataset.csv | rows, cols: (32951, 9)
+Columns: ['product_id', 'product_category_name', 'product_name_lenght', 'product_description_lenght', 'product_photos_qty', 'product_weight_g', 'product_length_cm', 'product_height_cm', 'product_width_cm']
+Nulls: {'product_category_name': 610, 'product_name_lenght': 610, 'product_description_lenght': 610, 'product_photos_qty': 610, 'product_weight_g': 2, 'product_length_cm': 2, 'product_height_cm': 2, 'product_width_cm': 2}
+Fully duplicated rows: 0
+======================================================================
+olist_sellers_dataset.csv | rows, cols: (3095, 4)
+Columns: ['seller_id', 'seller_zip_code_prefix', 'seller_city', 'seller_state']
+Nulls: none
+Fully duplicated rows: 0
+======================================================================
+product_category_name_translation.csv | rows, cols: (71, 2)
+Columns: ['product_category_name', 'product_category_name_english']
+Nulls: none
+Fully duplicated rows: 0
