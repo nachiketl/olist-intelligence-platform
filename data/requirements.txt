@@ -1,9 +1,0 @@
-pandas
-sqlalchemy
-psycopg[binary]
-openpyxl
-python-dotenv
-streamlit
-sqlglot
-pytest
-google-genai
