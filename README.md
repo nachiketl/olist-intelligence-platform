@@ -2,7 +2,14 @@
 End-to-end analytics project: PostgreSQL warehouse, Power BI report and a guarded AI agent,
 built on the public Olist Brazilian E-Commerce dataset (2016-2018, BRL).
 Portfolio project; not a deployed company system.
-## Progress- [x] Day 1: environment, raw load with audit log (9 tables, row counts verified)- [x] Day 2: staging layer, delivery metrics, 13 data-quality checks- [ ] Day 3: automated data-quality tests- [ ] Days 4-6: star schema, marts, advanced SQL- [ ] Day 7: Excel inputs and database security- [ ] Days 8-10: Power BI model and report- [ ] Days 11-13: AI agent (guarded SQL, investigations, evaluation)- [ ] Days 14-15: chat interface, documentation, demo
+## Progress- [x] Day 1: environment, raw load with audit log (9 tables, row counts verified)- [x] 
+Day 2: staging layer, delivery metrics, 13 data-quality checks- [ ] 
+Day 3: automated data-quality tests- [ ] 
+Days 4-6: star schema, marts, advanced SQL- [ ]
+Day 7: Excel inputs and database security- [ ]
+Days 8-10: Power BI model and report- [ ] 
+Days 11-13: AI agent (guarded SQL, investigations, evaluation)- [ ] 
+Days 14-15: chat interface, documentation, demo
 ## Architecture
 raw (exact copy) -> staging (typed, deduplicated) -> core (star schema) -> marts (KPIs)-> Power BI and AI agent
 ## Run it
