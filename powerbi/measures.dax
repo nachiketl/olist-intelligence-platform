@@ -1,0 +1,247 @@
+// =====================================================================
+// Olist Commerce Intelligence Platform: Power BI measures
+// File: powerbi/measures.dax
+// Data: Olist Brazilian E-Commerce (Kaggle), Jan 2017 to Aug 2018, BRL
+// Portfolio project on public historical data. Targets are illustrative.
+// Table names use the "schema table" style (for example 'marts v_sales_items').
+// =====================================================================
+
+
+// ---------------------------------------------------------------------
+// PAGE 1 and 2: EXECUTIVE OVERVIEW, SALES AND PRODUCTS
+// Format: Revenue "R$ "#,0.00 | Total Orders #,0 | AOV "R$ "#,0.00 | Target Attainment % 0.0%
+// ---------------------------------------------------------------------
+
+Revenue =
+SUM ( 'marts v_sales_items'[price] )
+
+Total Orders =
+DISTINCTCOUNT ( 'marts v_sales_items'[order_id] )
+
+AOV =
+DIVIDE ( [Revenue], [Total Orders] )
+
+Target Attainment % =
+DIVIDE (
+    SUM ( 'marts target_vs_actual'[actual_revenue] ),
+    SUM ( 'marts target_vs_actual'[target_revenue] )
+)
+
+Avg Review Score =
+AVERAGE ( 'marts kpi_summary'[avg_review] )
+
+Total Customers =
+COUNTROWS ( 'core dim_customers' )
+
+Customer AOV =
+[AOV]
+
+
+// ---------------------------------------------------------------------
+// PAGE 3: CUSTOMERS
+// Format: Customers #,0 | Repeat Customers #,0 | Repeat Rate % 0.00% | Avg Spend "R$ "#,0.00
+// ---------------------------------------------------------------------
+
+Customers =
+DISTINCTCOUNT ( 'marts v_sales_orders'[customer_key] )
+
+Orders =
+DISTINCTCOUNT ( 'marts v_sales_orders'[order_id] )
+
+Repeat Customers =
+COUNTROWS (
+    FILTER (
+        VALUES ( 'marts v_sales_orders'[customer_key] ),
+        CALCULATE ( DISTINCTCOUNT ( 'marts v_sales_orders'[order_id] ) ) > 1
+    )
+)
+
+Repeat Rate % =
+DIVIDE ( [Repeat Customers], [Customers] )
+
+Avg Spend per Customer =
+DIVIDE ( SUM ( 'marts v_sales_orders'[item_revenue] ), [Customers] )
+
+Customer Insight =
+"Only " & FORMAT ( [Repeat Rate %], "0.0%" ) & " of customers bought more than once."
+
+
+// ---------------------------------------------------------------------
+// PAGE 4: LOGISTICS
+// Format: Avg Delivery Days 0.00 | Late Rate % 0.00% | Avg Freight "R$ "#,0.00
+// ---------------------------------------------------------------------
+
+Delivered Orders =
+CALCULATE (
+    DISTINCTCOUNT ( 'marts v_sales_orders'[order_id] ),
+    'marts v_sales_orders'[is_delivered] = TRUE ()
+)
+
+Late Orders =
+CALCULATE (
+    DISTINCTCOUNT ( 'marts v_sales_orders'[order_id] ),
+    'marts v_sales_orders'[is_late] = TRUE ()
+)
+
+Late Rate % =
+DIVIDE ( [Late Orders], [Delivered Orders] )
+
+// Older version of Late Rate % (value x 100). Keep only if a visual still uses it.
+Late Delivery Rate % =
+DIVIDE (
+    CALCULATE ( COUNTA ( 'marts v_sales_orders'[order_id] ), 'marts v_sales_orders'[is_late] = TRUE () ),
+    CALCULATE ( COUNTA ( 'marts v_sales_orders'[order_id] ), 'marts v_sales_orders'[is_delivered] = TRUE () )
+) * 100
+
+Avg Delivery Days =
+AVERAGE ( 'marts v_sales_orders'[delivery_days] )
+
+Avg Freight per Order =
+DIVIDE ( SUM ( 'marts v_sales_orders'[freight_total] ), [Orders] )
+
+Logistics Insight =
+"Late deliveries: " & FORMAT ( [Late Rate %], "0.0%" ) & " of delivered orders; average delivery takes "
+    & FORMAT ( [Avg Delivery Days], "0.0" ) & " days."
+
+
+// ---------------------------------------------------------------------
+// PAGE 5: SELLERS
+// Format: Active Sellers #,0 | Seller Revenue and Revenue per Seller "R$ "#,0
+// ---------------------------------------------------------------------
+
+Seller Revenue =
+SUM ( 'marts v_sales_items'[price] )
+
+Seller Orders =
+DISTINCTCOUNT ( 'marts v_sales_items'[order_id] )
+
+Active Sellers =
+DISTINCTCOUNT ( 'marts v_sales_items'[seller_key] )
+
+Revenue per Seller =
+DIVIDE ( [Seller Revenue], [Active Sellers] )
+
+Top 10 Seller Share % =
+VAR top10 =
+    TOPN ( 10, VALUES ( 'core dim_sellers'[seller_key] ), [Seller Revenue], DESC )
+RETURN
+    DIVIDE (
+        CALCULATE ( [Seller Revenue], KEEPFILTERS ( top10 ) ),
+        CALCULATE ( [Seller Revenue], ALLSELECTED ( 'core dim_sellers' ) )
+    )
+
+Seller Insight =
+FORMAT ( [Active Sellers], "#,0" ) & " sellers are active; the top 10 earn "
+    & FORMAT ( [Top 10 Seller Share %], "0.0%" ) & " of revenue."
+
+Sellers by Size =
+VAR lo = SELECTEDVALUE ( 'Seller Size Bucket'[MinOrders] )
+VAR hi = SELECTEDVALUE ( 'Seller Size Bucket'[MaxOrders] )
+RETURN
+    COUNTROWS (
+        FILTER (
+            VALUES ( 'core dim_sellers'[seller_key] ),
+            VAR n = [Seller Orders]
+            RETURN n >= lo && n <= hi
+        )
+    )
+
+
+// ---------------------------------------------------------------------
+// PAGE 6: AI INSIGHTS (rule-based checks, not AI)
+// ---------------------------------------------------------------------
+
+AI Insight Note =
+"Rule checks below are rule-based, not AI. AI summaries and recommendations appear after the agent is built (Days 12 and 13)."
+
+Rule Hits =
+SWITCH (
+    SELECTEDVALUE ( 'Rule Check'[Rule] ),
+    "R001", CALCULATE ( COUNTROWS ( 'marts state_delivery' ), 'marts state_delivery'[late_rate_pct] > 12 ) + 0,
+    "R002", CALCULATE ( COUNTROWS ( 'marts state_delivery' ), 'marts state_delivery'[avg_review] < 4 ) + 0,
+    "R006", CALCULATE ( COUNTROWS ( 'marts monthly_sales' ), 'marts monthly_sales'[mom_pct] < -10 ) + 0,
+    "R007", CALCULATE ( COUNTROWS ( 'marts target_vs_actual_monthly' ), 'marts target_vs_actual_monthly'[attainment_pct] < 90 ) + 0,
+    "R008", IF ( MAX ( 'marts kpi_summary'[repeat_rate_pct] ) < 5, 1, 0 ),
+    "R009", IF ( MAX ( 'marts kpi_summary'[avg_delivery_days] ) > 15, 1, 0 )
+)
+
+Rule Status =
+IF ( [Rule Hits] > 0, "Triggered", "OK" )
+
+Rules Checked =
+COUNTROWS ( 'Rule Check' )
+
+Rules Triggered =
+COUNTROWS ( FILTER ( VALUES ( 'Rule Check'[Rule] ), [Rule Hits] > 0 ) )
+
+
+// ---------------------------------------------------------------------
+// PAGE 7: DATA QUALITY AND PIPELINE HEALTH
+// Format: Pass Rate % 0.0% | Last Test Run dd mmm yyyy hh:mm | Rows Loaded #,0
+// ---------------------------------------------------------------------
+
+Latest Run ID =
+VAR lastTs = MAX ( 'audit test_results'[run_at] )
+RETURN
+    CALCULATE ( MAX ( 'audit test_results'[run_id] ), 'audit test_results'[run_at] = lastTs )
+
+Tests Passed =
+VAR runId = [Latest Run ID]
+RETURN
+    CALCULATE (
+        COUNTROWS ( 'audit test_results' ),
+        FILTER (
+            'audit test_results',
+            'audit test_results'[run_id] = runId
+                && 'audit test_results'[outcome] = "passed"
+        )
+    )
+
+Tests Failed =
+VAR runId = [Latest Run ID]
+RETURN
+    CALCULATE (
+        COUNTROWS ( 'audit test_results' ),
+        FILTER (
+            'audit test_results',
+            'audit test_results'[run_id] = runId
+                && 'audit test_results'[outcome] <> "passed"
+        )
+    ) + 0
+
+Tests Total =
+[Tests Passed] + [Tests Failed]
+
+Pass Rate % =
+DIVIDE ( [Tests Passed], [Tests Total] )
+
+Last Test Run =
+MAX ( 'audit test_results'[run_at] )
+
+Rows Loaded =
+SUM ( 'audit load_log'[rows_loaded] )
+
+Load Tables OK =
+CALCULATE ( COUNTROWS ( 'audit load_log' ), 'audit load_log'[status] = "OK" )
+
+Load Tables Total =
+COUNTROWS ( 'audit load_log' )
+
+Load Match Text =
+[Load Tables OK] & " of " & [Load Tables Total] & " tables OK"
+
+DQ Issues Logged =
+COUNTROWS ( 'audit dq_issues' )
+
+Layer Status =
+IF ( [Tests Failed] = 0, "Success", "Check tests" )
+
+Pipeline Status =
+IF (
+    [Tests Failed] = 0,
+    "Healthy: all tests passing",
+    "Failing: " & [Tests Failed] & " tests, do not publish"
+)
+
+Page Title =
+[Tests Total] & " tests protect every number"
