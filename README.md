@@ -62,6 +62,19 @@ primary key and its own tests. These dimensions are what Power BI will filter an
 - [x] Day 6: 8 marts (growth, Pareto, RFM, cohorts, seller risk), KPI definitions, 45 tests (194 total)
 Day 7: Excel business inputs and database security
 Excel becomes a controlled business input. We create three workbooks: sales_targets.xlsx (illustrative monthly
+
+## Power BI report
+![Executive Overview](powerbi/31_page1_overview.png)
+![Sales and Products](powerbi/32_page2_sales_products.png)
+![Customers](powerbi/33_page3_customers.png)
+![Logistics](powerbi/34_page4_logistics.png)
+![Sellers](powerbi/35_page5_sellers.png)
+![AI Insights](powerbi/36_page6_ai_insights.png)
+![Data Quality](powerbi/37_page7_data_quality.png)
+
+Full report: [olist_report.pdf](powerbi/olist_report.pdf)
+
+Portfolio project on public Olist data (2016 to 2018, BRL). Targets are illustrative. The .pbix is not published because of the dataset's non-commercial licence.
 targets, labelled as such), business_rules.xlsx (rule id, metric, operator, threshold, severity, recommended action,
 active) and data_dictionary.xlsx. A Python loader validates each file (column names, types, uniqueness, allowed
 operators, no negative targets) before loading into reference tables with an audit record, and a new mart compares
