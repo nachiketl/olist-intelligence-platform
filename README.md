@@ -1,4 +1,6 @@
-# Olist Commerce Intelligence & AI Decision Platform
+<<<<<<< HEAD
+=======
+
 End-to-end analytics project: PostgreSQL warehouse, Power BI report and a guarded AI agent,
 built on the public Olist Brazilian E-Commerce dataset (2016-2018, BRL).
 Portfolio project; not a deployed company system.
@@ -81,3 +83,4 @@ operators, no negative targets) before loading into reference tables with an aud
 actual revenue with target. The seller risk tiers and delivery thresholds move into business_rules. We also create
 database roles: bi_ro for Power BI, agent_ro (read-only on marts only, with a statement timeout) and agent_rw
 (insert only into the agent tables), and write tests proving the agent role cannot read raw data or change anything.
+>>>>>>># Olist Commerce Intelligence & AI Decision Platform
